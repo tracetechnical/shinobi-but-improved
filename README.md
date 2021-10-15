@@ -1,4 +1,4 @@
-# Shinobi Pro
+# Fork of Shinobi Pro
 ### (Shinobi Open Source Software)
 
 Shinobi is the Open Source CCTV Solution written in Node.JS. Designed with multiple account system, Streams by WebSocket, and Direct saving to MP4. Shinobi can record IP Cameras and Local Cameras.
@@ -48,7 +48,10 @@ Get a Mobile License to unlock extended features on the Mobile App as well as su
 http://shinobi.video/why
 
 ## Author
+This Repo:
+Alex Bush, Trace Technical Services
 
+Upstream:
 Moe Alam, Shinobi Systems
 
 Shinobi is developed by many contributors. Please have a look at the commits to see some of who they are :)

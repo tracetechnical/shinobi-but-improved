@@ -680,6 +680,10 @@ $(document).ready(function(e){
                 if(e.e.length>0){
                     e.e.remove()
                 }else{
+		    var f = '';
+		    for(i=1; i < 6; i++) {
+			f+='<a monitor="control" control="p_'+i+'" class="btn btn-default" style="padding:0">P<sub>'+ i +'</sub></a>'
+		    }
                     var html = `<div class="PTZ_controls">
                         <div class="pad">
                             <div class="control top" monitor="control" control="up"></div>
@@ -695,6 +699,8 @@ $(document).ready(function(e){
                         <div class="btn-group btn-group-sm btn-group-justified">
                             <a title="${lang['Enable Nightvision']}" class="nv_enable btn btn-default" monitor="control" control="enable_nv"><i class="fa fa-moon-o"></i></a>
                             <a title="${lang['Disable Nightvision']}" class="nv_disable btn btn-default" monitor="control" control="disable_nv"><i class="fa fa-sun-o"></i></a>
+                        </div>
+                        <div class="btn-group btn-group-sm btn-group-justified">` + f + `
                         </div>
                         ${$.parseJSON($.ccio.mon[$user.ke + e.mid + $user.auth_token].details,{}).is_onvif === '1' ? `
                         <div class="btn-group btn-group-sm btn-group-justified">

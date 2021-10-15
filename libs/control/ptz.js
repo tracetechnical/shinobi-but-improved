@@ -74,6 +74,16 @@ module.exports = function(s,config,lang){
             break;
             default:
             try{
+		if(options.direction && options.direction.startsWith("p")){
+		  console.log("LAUNCH PRESET: " + options.direction);	
+                  moveLock[options.ke + options.id] = true
+		  moveToPresetPosition({ke: options.ke, id: options.id, PresetToken: options.direction.split("p_")[1]},(t) =>{ 
+                    moveLock[options.ke + options.id] = false
+	            console.log("successful move")
+		    console.log(JSON.stringify(t))
+		  });
+		  break;
+		}
                 var controlOptions = {
                     Velocity : {}
                 }
@@ -96,7 +106,8 @@ module.exports = function(s,config,lang){
                 (['x','y','z']).forEach(function(axis){
                     if(!controlOptions.Velocity[axis])
                         controlOptions.Velocity[axis] = 0
-                })
+		}
+                )
                 if(monitorConfig.details.control_stop === '1'){
                     moveLock[options.ke + options.id] = true
                     startMove({
@@ -146,6 +157,7 @@ module.exports = function(s,config,lang){
                     })
                 }
             }catch(err){
+		console.log("X_X_X_X_ - " + JSON.stringify(options));
                 console.log(err)
                 console.log(new Error())
             }
@@ -161,7 +173,7 @@ module.exports = function(s,config,lang){
             s.userLog(monitorConfig,{type:lang['Control Error'],msg:lang.ControlErrorText1});
             return
         }
-        if(monitorConfig.details.control_url_stop_timeout === '0' && monitorConfig.details.control_stop === '1' && s.group[options.ke].activeMonitors[options.id].ptzMoving === true){
+        if(monitorConfig.details.control_url_sto_timeout === '0' && monitorConfig.details.control_stop === '1' && s.group[options.ke].activeMonitors[options.id].ptzMoving === true){
             options.direction = 'stopMove'
             s.group[options.ke].activeMonitors[options.id].ptzMoving = false
         }else{
@@ -333,6 +345,7 @@ module.exports = function(s,config,lang){
     const moveToPresetPosition = (options,callback) => {
         const nonStandardOnvif = s.group[options.ke].rawMonitorConfigurations[options.id].details.onvif_non_standard === '1'
         const profileToken = options.ProfileToken || "__CURRENT_TOKEN"
+	console.log("Moving to Preset " + options.PresetToken)
         return s.runOnvifMethod({
             auth: {
                 ke: options.ke,
@@ -340,9 +353,9 @@ module.exports = function(s,config,lang){
                 service: 'ptz',
                 action: 'gotoPreset',
             },
-            options: {
+		options: {
                 ProfileToken: profileToken,
-                PresetToken: options.PresetToken || nonStandardOnvif ? '1' : profileToken,
+                PresetToken: options.PresetToken,
                 Speed: {
                    "x": 1,
                    "y": 1,
@@ -354,12 +367,17 @@ module.exports = function(s,config,lang){
     const setHomePositionTimeout = (event) => {
         clearTimeout(ptzTimeoutsUntilResetToHome[event.ke + event.id])
         ptzTimeoutsUntilResetToHome[event.ke + event.id] = setTimeout(() => {
-            moveToPresetPosition({
-                ke: event.ke,
-                id: event.id,
-            },(endData) => {
-                s.debugLog(endData)
-            })
+	  ok = 0
+		moveToPresetPosition({
+                 ke: event.ke,
+               	 id: event.id,
+		 PresetToken: "1"    
+            	},(endData) => {
+		 s.debugLog(endData)
+		 console.log("END T/O MOVE")
+		 console.log(JSON.stringify(endData))
+		 console.log("_________________")
+           	 })
         },7000)
     }
     const getLargestMatrix = (matrices) => {
@@ -406,9 +424,11 @@ module.exports = function(s,config,lang){
                 s.userLog(event,msg)
                 // console.log(msg)
                 setHomePositionTimeout(event)
+	    	console.log("B_B_B_B__C_C_C Timeout 1");
             })
         }else{
             setHomePositionTimeout(event)
+	    console.log("C_C_C_C_C_C Timeout 2");
         }
     }
     return {
